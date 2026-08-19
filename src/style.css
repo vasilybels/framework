@@ -9,7 +9,7 @@ svg text,
 }
 
 :root {
-  --observablehq-max-width: 1800px;
+  
   --chart-opacity-default: 0.75;
   --chart-group-fill-opacity: 0.08;
   --chart-stroke-thin: 0.75;

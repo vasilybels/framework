@@ -1,12 +1,13 @@
 import * as d3 from "npm:d3";
+import {SONYC_COARSE_CATEGORIES, SONYC_COARSE_KEY_BY_NAME} from "../utils/sonycData.js";
 
 const transitionMs = 220;
 const defaultOpacity = 0.75;
 const groupFillOpacity = 0.08; // soft category wash behind each coarse group, for Gestalt grouping
 const leafStrokeWidth = 0.75;
-const groupStrokeWidth = 1.5;
-const leafStrokeDarken = 0.4;
-const groupStrokeDarken = 0.6;
+const groupStrokeWidth = 1;
+const leafStrokeDarken = 0.5;
+const groupStrokeDarken = 0.5;
 const lightFillLuminanceThreshold = 0.6; // above this, switch label text to dark for contrast
 const minGroupLabelFontSize = 9;
 const maxGroupLabelFontSize = 15;
@@ -15,31 +16,32 @@ const minGroupLabelInsetPx = 6;
 
 // MD USAGE:
 // ```js
+// import {buildBubbleHierarchy, filterUniversalTruthRows} from "../utils/sonycData.js";
 // import {renderBubbleChart} from "./components/chart1.js";
-// const data = await FileAttachment("data/bubbleData.json").json();
-// display(renderBubbleChart({data, width}));
+// const rows = await FileAttachment("data/data.csv").csv();
+// const hierarchy = buildBubbleHierarchy(filterUniversalTruthRows(rows));
+// display(renderBubbleChart({data: hierarchy, width}));
 // ```
 export const renderBubbleChart = ({data, width = 928} = {}) => {
   if (!data || typeof data !== "object") {
     throw new Error("This chart requires a hierarchical data object.");
   }
 
-  const myColors = ['#450840', '#403539', '#4b4d47', '#5a645a', '#6c7b72', '#80928b', '#97a9a7', '#afc1c5', '#c8d9e4'];
-
-const categories = [
-    "1_engine_presence",
-    "2_machinery-impact_presence",
-    "3_non-machinery-impact_presence",
-    "4_powered-saw_presence",
-    "5_alert-signal_presence",
-    "6_music_presence",
-    "7_human-voice_presence",
-    "8_dog_presence"
+  const myColors = [
+    '#450840', 
+    '#403539', 
+    '#4b4d47', 
+    '#5a645a', 
+    '#6c7b72', 
+    '#80928b', 
+    '#97a9a7', 
+    '#afc1c5', 
+    '#c8d9e4'
   ];
 
   const chartWidth = Math.max(320, width);
   const chartHeight = Math.max(420, Math.round(chartWidth * 0.78));
-  const palette = (categories, myColors) ? d3.scaleOrdinal().domain(categories).range(myColors) : d3.scaleOrdinal(d3.schemeCategory10);
+  const palette = d3.scaleOrdinal().domain(SONYC_COARSE_CATEGORIES).range(myColors);
   const formatCount = d3.format(",d");
 
   const root = d3.hierarchy(data)
@@ -48,10 +50,7 @@ const categories = [
 
   d3.pack()
     .size([chartWidth, chartHeight])
-    .padding(3)(root);
-
-  const topLevelNames = (root.children ?? []).map((d) => d.data?.name ?? "unknown");
-  palette.domain(topLevelNames);
+    .padding(2)(root);
 
   const container = d3.create("figure").attr("class", "bubble-chart");
   container.append("style").text(`
@@ -59,7 +58,6 @@ const categories = [
     .bubble-chart__svg { width: 100%; height: auto; display: block; }
     .bubble-chart .hierarchy-circle { cursor: pointer; }
     .bubble-chart .bubble-label { pointer-events: none; text-anchor: middle; dominant-baseline: middle; stroke-width: 0; font-weight: 400; }
-    .bubble-chart .bubble-label--group { letter-spacing: 0.02em; }
     .bubble-chart .bubble-label-arc { fill: none; stroke: none; }
     .bubble-chart__tooltip {
       position: absolute;
@@ -70,7 +68,7 @@ const categories = [
       background: var(--theme-background);
       color: var(--theme-foreground);
       border: 1px solid #000;
-      border-radius: 0px;
+      border-radius: 1px;
       padding: 0.35rem 0.7rem 0.35rem 0.7rem;
       font-size: 0.85rem;
       line-height: 1.5;
@@ -94,10 +92,10 @@ const categories = [
   // Identify a node by its full ancestor path so ids stay unique at any depth.
   const nodeId = (node) => node.ancestors().map((a) => a.data?.name ?? "").reverse().join("__");
 
-  const topAncestorName = (node) => {
+  const topAncestorCategory = (node) => {
     let n = node;
     while (n.depth > 1) n = n.parent;
-    return n.data?.name ?? "unknown";
+    return n.data?.id ?? SONYC_COARSE_KEY_BY_NAME[n.data?.name] ?? "unknown";
   };
 
   const isGroup = (node) => Boolean(node.children && node.children.length);
@@ -105,7 +103,7 @@ const categories = [
   // Groups get a faint wash of their own hue (context); leaves get the full-strength fill (content).
   const fillFor = (node) => {
     if (node.depth === 0) return "rgba(0,0,0,0)";
-    const base = d3.color(palette(topAncestorName(node)));
+    const base = d3.color(palette(topAncestorCategory(node)));
     if (!base) return "#f8f9fa";
     return base.copy({opacity: isGroup(node) ? groupFillOpacity : defaultOpacity}).toString();
   };
@@ -113,7 +111,7 @@ const categories = [
   // Every circle gets a same-hue stroke so touching same-category bubbles stay visually separated.
   const strokeFor = (node) => {
     if (node.depth === 0) return "rgba(0,0,0,0)";
-    const base = d3.color(palette(topAncestorName(node)));
+    const base = d3.color(palette(topAncestorCategory(node)));
     if (!base) return "rgba(0,0,0,0.3)";
     return isGroup(node) ? base.darker(groupStrokeDarken).toString() : base.darker(leafStrokeDarken).toString();
   };
@@ -135,7 +133,7 @@ const categories = [
   // Curved group labels take on their own category hue (darkened if needed for contrast)
   // so the label color directly reinforces which region it names.
   const groupLabelColorFor = (d) => {
-    const base = d3.color(palette(topAncestorName(d)));
+    const base = d3.color(palette(topAncestorCategory(d)));
     if (!base) return "var(--theme-foreground)";
     return luminanceOf(base) > lightFillLuminanceThreshold ? base.darker(1.6).toString() : base.toString();
   };
@@ -150,7 +148,7 @@ const categories = [
 
   // Tune these module-level caps to control coarse curved label size.
   const groupLabelFontSize = (d) => Math.max(minGroupLabelFontSize, Math.min(maxGroupLabelFontSize, d.r / 8));
-  const groupLabelInsetPx = (d) => Math.max(minGroupLabelInsetPx, groupLabelFontSize(d) * groupLabelInsetMultiplier);
+  const groupLabelInsetPx = (d) => (d.data?.name === "Powered saw" || d.data?.name === "Machinery") ? -6 : Math.max(minGroupLabelInsetPx, groupLabelFontSize(d) * groupLabelInsetMultiplier);
   const shouldGroupLabel = (d) => {
     if (!isGroup(d) || d.depth !== 1 || d.r < 20) return false;
     const fs = groupLabelFontSize(d);
@@ -238,6 +236,23 @@ const categories = [
     .attr("text-anchor", "middle")
     .text((d) => cleanName(d.data?.name ?? ""));
 
+//   svg.append("text")
+//     .attr("x", 40)
+//     .attr("y", 20)
+//     .attr("class", "chart-title")
+//     .style("font-size", "18px")
+//     .style("font-weight", "bold")
+//     .text("Monthly Sales Report");
+
+// // Add Subheading
+//   svg.append("text")
+//     .attr("x", 40)
+//     .attr("y", 40)
+//     .attr("class", "chart-subtitle")
+//     .style("font-size", "12px")
+//     .style("fill", "gray")
+//     .text("Sales data for the first and second quarters");
+
   function cleanName(name) {
     return String(name ?? "").replace(/-/g, " ");
   }
@@ -245,11 +260,11 @@ const categories = [
   function showTooltip(event, node) {
     const [x, y] = d3.pointer(event, container.node());
     const count = node.value ?? node.data?.value ?? 0;
-    const swatchColor = d3.color(palette(topAncestorName(node)))?.formatHex() ?? "#999";
+    const swatchColor = d3.color(palette(topAncestorCategory(node)))?.formatHex() ?? "#999";
     tooltip
       .style("transform", `translate(${x + 14}px, ${y + 14}px)`)
       .style("opacity", 1)
-      .html(`<span class="bubble-chart__tooltip-swatch" style="background:${swatchColor}"></span><strong>${cleanName(node.data?.name)}</strong><br>${formatCount(count)} instances`);
+      .html(`<strong>${cleanName(node.data?.name)}</strong><br>${formatCount(count)} instances`);
   }
 
   function hideTooltip() {
@@ -273,7 +288,7 @@ const categories = [
         if (isGroup(d)) return fillFor(d); // keep the category wash constant; only its opacity (below) responds to hover
         if (targetIsGroup) {
           const inGroup = d.parent && nodeId(d.parent) === targetId;
-          const base = d3.color(palette(topAncestorName(d)));
+          const base = d3.color(palette(topAncestorCategory(d)));
           return base ? base.copy({opacity: inGroup ? defaultOpacity : defaultOpacity * 0.16}).toString() : "#f8f9fa";
         }
         return fillFor(d);
