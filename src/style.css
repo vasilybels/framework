@@ -9,5 +9,12 @@ svg text,
 }
 
 :root {
-    --observablehq-max-width: 1800px;
+  --observablehq-max-width: 1800px;
+  --chart-opacity-default: 0.75;
+  --chart-group-fill-opacity: 0.08;
+  --chart-stroke-thin: 0.75;
+  --chart-stroke-strong: 1.5;
+  --chart-label-font-sm: 0.85rem;
+  --chart-label-font-md: 14px;
+  --chart-label-font-lg: 16px;
 }
