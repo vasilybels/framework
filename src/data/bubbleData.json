@@ -1,0 +1,151 @@
+{
+  "name": "Sounds",
+  "children": [
+    {
+      "name": "Engines",
+      "children": [
+        {
+          "name": "Small engine",
+          "value": 18
+        },
+        {
+          "name": "Medium engine",
+          "value": 248
+        },
+        {
+          "name": "Large engine",
+          "value": 406
+        },
+        {
+          "name": "Engine of uncertain size",
+          "value": 154
+        }
+      ]
+    },
+    {
+      "name": "Machinery",
+      "children": [
+        {
+          "name": "Rock drill",
+          "value": 6
+        },
+        {
+          "name": "Jackhammer",
+          "value": 20
+        },
+        {
+          "name": "Hoe ram",
+          "value": 2
+        },
+        {
+          "name": "Pile driver",
+          "value": 2
+        },
+        {
+          "name": "Other machinery",
+          "value": 28
+        }
+      ]
+    },
+    {
+      "name": "Non machinery impact",
+      "value": 348
+    },
+    {
+      "name": "Powered saw",
+      "children": [
+        {
+          "name": "Chainsaw",
+          "value": 5
+        },
+        {
+          "name": "Small or medium rotating saw",
+          "value": 16
+        },
+        {
+          "name": "Large rotating saw",
+          "value": 7
+        },
+        {
+          "name": "Other saw",
+          "value": 17
+        }
+      ]
+    },
+    {
+      "name": "Alert signals",
+      "children": [
+        {
+          "name": "Car horn",
+          "value": 157
+        },
+        {
+          "name": "Car alarm",
+          "value": 1
+        },
+        {
+          "name": "Siren",
+          "value": 106
+        },
+        {
+          "name": "Reverse beeper",
+          "value": 33
+        },
+        {
+          "name": "Other alert signals",
+          "value": 13
+        }
+      ]
+    },
+    {
+      "name": "Music",
+      "children": [
+        {
+          "name": "Stationary music",
+          "value": 62
+        },
+        {
+          "name": "Mobile music",
+          "value": 8
+        },
+        {
+          "name": "Ice cream truck",
+          "value": 1
+        },
+        {
+          "name": "Music from uncertain source",
+          "value": 29
+        }
+      ]
+    },
+    {
+      "name": "Human voice",
+      "children": [
+        {
+          "name": "Talking",
+          "value": 563
+        },
+        {
+          "name": "Shouting",
+          "value": 70
+        },
+        {
+          "name": "Large crowd",
+          "value": 1
+        },
+        {
+          "name": "Amplified speech",
+          "value": 4
+        },
+        {
+          "name": "Other human voice",
+          "value": 50
+        }
+      ]
+    },
+    {
+      "name": "Dog barking or whining",
+      "value": 49
+    }
+  ]
+}

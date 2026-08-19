@@ -1,0 +1,47 @@
+{
+  "engine": {
+    "1": "small-sounding-engine",
+    "2": "medium-sounding-engine",
+    "3": "large-sounding-engine",
+    "X": "engine-of-uncertain-size"
+  },
+  "machinery-impact": {
+    "1": "rock-drill",
+    "2": "jackhammer",
+    "3": "hoe-ram",
+    "4": "pile-driver",
+    "X": "other-unknown-impact-machinery"
+  },
+  "non-machinery-impact": {
+    "1": "non-machinery-impact"
+  },
+  "powered-saw": {
+    "1": "chainsaw",
+    "2": "small-medium-rotating-saw",
+    "3": "large-rotating-saw",
+    "X": "other-unknown-powered-saw"
+  },
+  "alert-signal": {
+    "1": "car-horn",
+    "2": "car-alarm",
+    "3": "siren",
+    "4": "reverse-beeper",
+    "X": "other-unknown-alert-signal"
+  },
+  "music": {
+    "1": "stationary-music",
+    "2": "mobile-music",
+    "3": "ice-cream-truck",
+    "X": "music-from-uncertain-source"
+  },
+  "human-voice": {
+    "1": "person-or-small-group-talking",
+    "2": "person-or-small-group-shouting",
+    "3": "large-crowd",
+    "4": "amplified-speech",
+    "X": "other-unknown-human-voice"
+  },
+  "dog": {
+    "1": "dog-barking-whining"
+  }
+}

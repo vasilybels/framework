@@ -1,0 +1,13 @@
+@import url("observablehq:default.css");
+@import url("observablehq:theme-cotton.css");
+@import url("observablehq:theme-air.css");
+
+svg text,
+.bubble-chart,
+.bubble-chart__tooltip {
+  font-family: "Monda", var(--sans-serif);
+}
+
+:root {
+    --observablehq-max-width: 1800px;
+}
