@@ -1,4 +1,10 @@
 import * as d3 from "npm:d3";
+import {
+  buildRadialPresenceData,
+  filterUniversalTruthRows,
+  SONYC_COARSE_CATEGORIES,
+  SONYC_COARSE_LABELS
+} from "../utils/sonycData.js";
 
 const transitionMs = 200;
 const defaultOpacity = 0.75;
@@ -6,28 +12,6 @@ const areaStrokeWidth = 0.75;
 const areaStrokeWidthHover = 1.5;
 const lightFillLuminanceThreshold = 0.6;
 const radialChartMaxWidth = 700;
-
-const categories = [
-  "1_engine_presence",
-  "2_machinery-impact_presence",
-  "3_non-machinery-impact_presence",
-  "4_powered-saw_presence",
-  "5_alert-signal_presence",
-  "6_music_presence",
-  "7_human-voice_presence",
-  "8_dog_presence"
-];
-
-const cleanCategories = {
-  "1_engine_presence": "engine",
-  "2_machinery-impact_presence": "machinery",
-  "3_non-machinery-impact_presence": "non-machinery impact",
-  "4_powered-saw_presence": "powered saw",
-  "5_alert-signal_presence": "alert signals",
-  "6_music_presence": "music",
-  "7_human-voice_presence": "human voice",
-  "8_dog_presence": "dog barking or whining"
-};
 
 const myColors = [
   "#450840",
@@ -44,15 +28,22 @@ const myColors = [
 // MD USAGE:
 // ```js
 // import {renderRadialPresenceChart} from "./components/chart2.js";
+// import {buildRadialPresenceData, filterUniversalTruthRows} from "../utils/sonycData.js";
 // const rows = await FileAttachment("data/data.csv").csv();
-// display(renderRadialPresenceChart({data: rows, width}));
+// const radial = buildRadialPresenceData(filterUniversalTruthRows(rows));
+// display(renderRadialPresenceChart({data: radial, width}));
 // ```
 export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
-  if (!Array.isArray(data)) {
-    throw new Error("This chart requires CSV rows as an array.");
+  let radialData;
+  if (Array.isArray(data)) {
+    radialData = buildRadialPresenceData(filterUniversalTruthRows(data));
+  } else if (data && Array.isArray(data.processedData)) {
+    radialData = data;
+  } else {
+    throw new Error("This chart requires either CSV rows or preprocessed radial data.");
   }
 
-  const filteredData = data.filter((row) => +row.annotator_id === 0);
+  const {processedData, maxVal, sortedCategories, labelsByCategory = SONYC_COARSE_LABELS} = radialData;
 
   const chartWidth = Math.min(radialChartMaxWidth, Math.max(360, width));
   const chartHeight = chartWidth;
@@ -60,7 +51,7 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
   const fixedInnerRadius = chartWidth / 6;
   const fixedOuterRadius = chartWidth / 2 - margin;
 
-  const colorScheme = d3.scaleOrdinal().domain(categories).range(myColors);
+  const colorScheme = d3.scaleOrdinal().domain(SONYC_COARSE_CATEGORIES).range(myColors);
 
   const container = d3.create("figure")
     .attr("class", "radial-presence-chart")
@@ -115,30 +106,6 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
   `);
 
   const legend = container.append("div").attr("class", "radial-presence-chart__legend");
-
-  const rollups = d3.rollup(
-    filteredData,
-    (group) =>
-      categories.reduce((acc, cat) => {
-        acc[cat] = d3.sum(group, (row) => (String(row[cat]) === "1" ? 1 : 0));
-        return acc;
-      }, {}),
-    (row) => +row.hour
-  );
-
-  const processedData = Array.from({length: 24}, (_, hour) => {
-    const counts =
-      rollups.get(hour) || categories.reduce((acc, cat) => ({...acc, [cat]: 0}), {});
-    return {hour, ...counts};
-  });
-
-  const maxVal = d3.max(processedData, (d) => d3.max(categories, (cat) => d[cat])) || 1;
-
-  const sortedCategories = [...categories].sort((a, b) => {
-    const sumA = d3.sum(processedData, (d) => d[a]);
-    const sumB = d3.sum(processedData, (d) => d[b]);
-    return sumB - sumA;
-  });
 
   const x = d3.scaleLinear().domain([0, 24]).range([0, 2 * Math.PI]);
 
@@ -270,7 +237,7 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
   }
 
   sortedCategories.forEach((cat) => {
-    const cleanName = cleanCategories[cat] ?? cat;
+    const cleanName = labelsByCategory[cat] ?? cat;
 
     const item = legend
       .append("div")
@@ -316,7 +283,7 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
     })
     .on("mouseenter", (_event, cat) => {
       const hoveredIndex = sortedCategories.indexOf(cat);
-      const cleanName = cleanCategories[cat] ?? cat;
+      const cleanName = labelsByCategory[cat] ?? cat;
       const totalSum = d3.sum(processedData, (row) => row[cat]);
       handleHover(hoveredIndex, cleanName, totalSum, cat);
     })

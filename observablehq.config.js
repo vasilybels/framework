@@ -26,7 +26,7 @@ export default {
 
   // The path to the source root.
   root: "src",
-  theme: ["air", "ink"] // try "light", "dark", "slate", etc.
+  theme: ["cotton", "ink"] // try "light", "dark", "slate", etc.
   // header: "", // what to show in the header (HTML)
   // footer: "Built with Observable.", // what to show in the footer (HTML)
   // sidebar: true, // whether to show the sidebar
