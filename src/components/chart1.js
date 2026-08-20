@@ -250,7 +250,7 @@ export const renderBubbleChart = ({
       .duration(transitionMs)
       .attr("stroke-width", (d) => {
         if (d.depth === 0) return 0;
-        return nodeId(d) === targetId ? strokeWidthFor(d) + 0.75 : strokeWidthFor(d);
+        return nodeId(d) === targetId ? strokeWidthFor(d) + 1 : strokeWidthFor(d);
       })
       .attr("fill", (d) => {
         if (d.depth === 0) return "rgba(0,0,0,0)";
