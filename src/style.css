@@ -138,6 +138,7 @@ p {
   z-index: 10;
   opacity: 0;
   transition: opacity 150ms ease;
+  font-family: "Geist Mono", monospace!important;
 }
 
 .bubble-chart__tooltip .tooltip-row,
@@ -232,6 +233,7 @@ p {
   z-index: 10;
   opacity: 0;
   transition: opacity 150ms ease;
+  font-family: "Geist Mono", monospace!important;
 }
 
 .radial-presence-chart__tooltip strong {

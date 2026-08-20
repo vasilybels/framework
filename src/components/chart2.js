@@ -26,9 +26,9 @@ const myColors = ['#450840', '#541535', '#5b2531', '#603431', '#634231', '#64503
 export const renderRadialPresenceChart = ({
   data,
   width = 928,
-  heading = "sound presence by hour",
-  subheading = "how often each category was recorded throughout the day",
-  footnote = "Counts represent sound instances recorded during each hour."
+  heading = "City of Commuters",
+  subheading = "How often the sounds from each coarse-grained category were recorded, by time of day.",
+  footnote = "Source: Sounds of New York City Urban Sound Tagging (SONYC-UST) dataset, version 2.4."
 } = {}) => {
   let radialData;
   if (Array.isArray(data)) {
@@ -180,7 +180,7 @@ export const renderRadialPresenceChart = ({
       .attr("fill", valueColor)
       .style("font-size", "var(--chart-label-font-md, 14px)")
       .style("font-weight", "400")
-      .text(`${formatCount(totalCount)} total instances`);
+      .text(`${formatCount(totalCount)} total occurrences`);
   }
 
   function handleHover(hoveredIndex, labelText, valueText, categoryKey) {
