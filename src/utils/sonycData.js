@@ -17,7 +17,7 @@ const SONYC_CATEGORY_CONFIG = [
       {key: "2-2_jackhammer_presence", name: "Jackhammer"},
       {key: "2-3_hoe-ram_presence", name: "Hoe ram"},
       {key: "2-4_pile-driver_presence", name: "Pile driver"},
-      {key: "2-X_other-unknown-impact-machinery_presence", name: "Other machinery"}
+      {key: "2-X_other-unknown-impact-machinery_presence", name: "Unknown machinery"}
     ]
   },
   {
@@ -33,7 +33,7 @@ const SONYC_CATEGORY_CONFIG = [
     name: "Powered saw",
     children: [
       {key: "4-1_chainsaw_presence", name: "Chainsaw"},
-      {key: "4-2_small-medium-rotating-saw_presence", name: "Small or medium rotating saw"},
+      {key: "4-2_small-medium-rotating-saw_presence", name: "Small/medium rotating saw"},
       {key: "4-3_large-rotating-saw_presence", name: "Large rotating saw"},
       {key: "4-X_other-unknown-powered-saw_presence", name: "Other saw"}
     ]
@@ -45,7 +45,7 @@ const SONYC_CATEGORY_CONFIG = [
       {key: "5-1_car-horn_presence", name: "Car horn"},
       {key: "5-2_car-alarm_presence", name: "Car alarm"},
       {key: "5-3_siren_presence", name: "Siren"},
-      {key: "5-4_reverse-beeper_presence", name: "Reverse beeper"},
+      {key: "5-4_reverse-beeper_presence", name: "Car reverse beeper"},
       {key: "5-X_other-unknown-alert-signal_presence", name: "Other alert signals"}
     ]
   },
@@ -56,18 +56,18 @@ const SONYC_CATEGORY_CONFIG = [
       {key: "6-1_stationary-music_presence", name: "Stationary music"},
       {key: "6-2_mobile-music_presence", name: "Mobile music"},
       {key: "6-3_ice-cream-truck_presence", name: "Ice cream truck"},
-      {key: "6-X_music-from-uncertain-source_presence", name: "Music from uncertain source"}
+      {key: "6-X_music-from-uncertain-source_presence", name: "Music from an uncertain source"}
     ]
   },
   {
     key: "7_human-voice_presence",
-    name: "Human voice",
+    name: "Voices",
     children: [
       {key: "7-1_person-or-small-group-talking_presence", name: "Talking"},
       {key: "7-2_person-or-small-group-shouting_presence", name: "Shouting"},
       {key: "7-3_large-crowd_presence", name: "Large crowd"},
       {key: "7-4_amplified-speech_presence", name: "Amplified speech"},
-      {key: "7-X_other-unknown-human-voice_presence", name: "Other human voice"}
+      {key: "7-X_other-unknown-human-voice_presence", name: "Other"}
     ]
   },
   {

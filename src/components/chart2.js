@@ -6,7 +6,7 @@ import {
   SONYC_COARSE_LABELS
 } from "../utils/sonycData.js";
 
-const transitionMs = 150;
+const transitionMs = 100;
 const defaultOpacity = 0.85;
 const areaStrokeWidth = 0.75;
 const areaStrokeWidthHover = 1;
@@ -23,7 +23,13 @@ const myColors = ['#450840', '#541535', '#5b2531', '#603431', '#634231', '#64503
 // const radial = buildRadialPresenceData(filterUniversalTruthRows(rows));
 // display(renderRadialPresenceChart({data: radial, width}));
 // ```
-export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
+export const renderRadialPresenceChart = ({
+  data,
+  width = 928,
+  heading = "sound presence by hour",
+  subheading = "how often each category was recorded throughout the day",
+  footnote = "Counts represent sound instances recorded during each hour."
+} = {}) => {
   let radialData;
   if (Array.isArray(data)) {
     radialData = buildRadialPresenceData(filterUniversalTruthRows(data));
@@ -47,6 +53,10 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
   const container = d3.create("figure")
     .attr("class", "radial-presence-chart")
     .style("--radial-chart-max-width", `${chartWidth}px`);
+
+  const header = container.append("header").attr("class", "chart-header");
+  header.append("h3").text(heading);
+  header.append("p").text(subheading);
 
   const legend = container.append("div").attr("class", "radial-presence-chart__legend");
 
@@ -98,6 +108,10 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
     const angle = (Math.atan2(pointerY, pointerX) + Math.PI / 2 + 2 * Math.PI) % (2 * Math.PI);
     return Math.round(x.invert(angle)) % 24;
   };
+  const tooltipText = (hour, count) => {
+    const row = (label, value) => `<div class="tooltip-row"><span class="tooltip-label">${label}</span><strong class="tooltip-value">${value}</strong></div>`;
+    return row("Hour", hour) + row("Count", formatCount(count));
+  };
 
   function showTooltip(event, categoryKey) {
     const hour = hourFromPointer(event);
@@ -109,7 +123,7 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
     tooltip
       .style("transform", `translate(${pointerX + 14}px, ${pointerY + 14}px)`)
       .style("opacity", 1)
-      .html(`Hour ${hour}<br>${formatCount(count)} instances`);
+      .html(tooltipText(hour, count));
   }
 
   function hideTooltip() {
@@ -373,6 +387,13 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
     .attr("stroke-width", 4)
     .attr("paint-order", "stroke")
     .text((d) => d);
+
+  if (footnote) {
+    container
+      .append("figcaption")
+      .attr("class", "chart-footnote")
+      .text(footnote);
+  }
 
   return container.node();
 };

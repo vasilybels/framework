@@ -1,7 +1,7 @@
 import * as d3 from "npm:d3";
 import {SONYC_COARSE_CATEGORIES, SONYC_COARSE_KEY_BY_NAME} from "../utils/sonycData.js";
 
-const transitionMs = 220;
+const transitionMs = 100;
 const defaultOpacity = 0.75;
 const groupFillOpacity = 0.08; // soft category wash behind each coarse group, for Gestalt grouping
 const leafStrokeWidth = 0;
@@ -22,7 +22,13 @@ const minGroupLabelInsetPx = 6;
 // const hierarchy = buildBubbleHierarchy(filterUniversalTruthRows(rows));
 // display(renderBubbleChart({data: hierarchy, width}));
 // ```
-export const renderBubbleChart = ({data, width = 928} = {}) => {
+export const renderBubbleChart = ({
+  data,
+  width = 928,
+  heading = "Cars and Humans are Most Frequent Noise Sources",
+  subheading = "Total number of occurrences of each sound in the SONYC-UST dataset, by fine- and coarse- grained category.",
+  footnote = "Source: Sounds of New York City Urban Sound Tagging (SONYC-UST) dataset, version 2.4."
+} = {}) => {
   if (!data || typeof data !== "object") {
     throw new Error("This chart requires a hierarchical data object.");
   }
@@ -43,32 +49,9 @@ export const renderBubbleChart = ({data, width = 928} = {}) => {
     .padding(2)(root);
 
   const container = d3.create("figure").attr("class", "bubble-chart");
-  container.append("style").text(`
-    .bubble-chart { margin: 0; margin-left: 0; margin-right: auto; max-width: 700px; width: 100%; position: relative; color: var(--theme-foreground); }
-    .bubble-chart__svg { width: 100%; height: auto; display: block; }
-    .bubble-chart .hierarchy-circle { cursor: pointer; }
-    .bubble-chart .bubble-label { pointer-events: none; text-anchor: middle; dominant-baseline: middle; stroke-width: 0; font-weight: 400; }
-    .bubble-chart .bubble-label-arc { fill: none; stroke: none; }
-    .bubble-chart__tooltip {
-      position: absolute;
-      top: 0;
-      left: 0;
-      transform: translate(-9999px, -9999px);
-      pointer-events: none;
-      background: var(--theme-background);
-      color: var(--theme-foreground);
-      border: 1px solid #000;
-      border-radius: 0px;
-      padding: 0.35rem 0.7rem;
-      font-size: 12px;
-      line-height: 1.3;
-      white-space: wrap;
-      z-index: 10;
-      opacity: 0;
-      transition: opacity 150ms ease;
-    }
-    .bubble-chart__tooltip strong { font-weight: 700; }
-  `);
+  const header = container.append("header").attr("class", "chart-header");
+  header.append("h3").text(heading);
+  header.append("p").text(subheading);
 
   const svg = container.append("svg")
     .attr("class", "bubble-chart__svg")
@@ -225,25 +208,22 @@ export const renderBubbleChart = ({data, width = 928} = {}) => {
     .attr("text-anchor", "middle")
     .text((d) => cleanName(d.data?.name ?? ""));
 
-//   svg.append("text")
-//     .attr("x", 40)
-//     .attr("y", 20)
-//     .attr("class", "chart-title")
-//     .style("font-size", "18px")
-//     .style("font-weight", "bold")
-//     .text("Monthly Sales Report");
-
-// // Add Subheading
-//   svg.append("text")
-//     .attr("x", 40)
-//     .attr("y", 40)
-//     .attr("class", "chart-subtitle")
-//     .style("font-size", "12px")
-//     .style("fill", "gray")
-//     .text("Sales data for the first and second quarters");
-
   function cleanName(name) {
-    return String(name ?? "").replace(/-/g, " ").toLowerCase();
+    return String(name ?? "").replace(/-/g, " ");
+  }
+
+  const tooltipText = (node, count) => {
+    const soundName = node.data?.name ?? node.name ?? "";
+    const catName = node.parent?.data?.name ?? "";
+    const soundType = cleanName(soundName).toLowerCase();
+    const countText = formatCount(count);
+    const category = cleanName(catName).toLowerCase();
+    const row = (label, value) => `<div class="tooltip-row"><span class="tooltip-label">${label}</span><strong class="tooltip-value">${value}</strong></div>`;
+
+    if (catName === "Sounds") {
+      return `${row("Sound type", soundType)}${row("Count", countText)}`;
+    }
+    return `${row("Sound type", soundType)}${row("Count", countText)}${row("Category", category)}`;
   }
 
   function showTooltip(event, node) {
@@ -253,7 +233,7 @@ export const renderBubbleChart = ({data, width = 928} = {}) => {
     tooltip
       .style("transform", `translate(${x + 14}px, ${y + 14}px)`)
       .style("opacity", 1)
-      .html(`<strong>${cleanName(node.data?.name)}</strong><br>${formatCount(count)}`);
+      .html(tooltipText(node, count));
   }
 
   function hideTooltip() {
@@ -312,6 +292,13 @@ export const renderBubbleChart = ({data, width = 928} = {}) => {
       .transition()
       .duration(transitionMs)
       .attr("opacity", 1);
+  }
+
+  if (footnote) {
+    container
+      .append("figcaption")
+      .attr("class", "chart-footnote")
+      .text(footnote);
   }
 
   return container.node();
