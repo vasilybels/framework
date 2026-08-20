@@ -174,6 +174,7 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
 
     centerTextGroup.interrupt().transition().duration(transitionMs).attr("opacity", 0.8);
 
+    
     areaGroup
       .selectAll(".area-path")
       .interrupt()
