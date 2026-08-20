@@ -22,9 +22,9 @@ const SONYC_CATEGORY_CONFIG = [
   },
   {
     key: "3_non-machinery-impact_presence",
-    name: "Non machinery impact",
+    name: "Non machinery",
     children: [
-      {key: "3-1_non-machinery-impact_presence", name: "Non machinery impact"}
+      {key: "3-1_non-machinery-impact_presence", name: "Non machinery"}
     ],
     collapseSingleChild: true
   },
@@ -72,9 +72,9 @@ const SONYC_CATEGORY_CONFIG = [
   },
   {
     key: "8_dog_presence",
-    name: "Dog barking or whining",
+    name: "Dog barking/whining",
     children: [
-      {key: "8-1_dog-barking-whining_presence", name: "Dog barking or whining"}
+      {key: "8-1_dog-barking-whining_presence", name: "Dog barking/whining"}
     ],
     collapseSingleChild: true
   }

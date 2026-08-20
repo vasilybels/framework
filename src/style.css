@@ -4,12 +4,16 @@
 
 svg text,
 .bubble-chart,
-.bubble-chart__tooltip {
+.bubble-chart__tooltip,
+.radial-presence-chart__tooltip {
+  font-family: "Monda", var(--sans-serif);
+}
+
+body {
   font-family: "Monda", var(--sans-serif);
 }
 
 :root {
-  
   --chart-opacity-default: 0.75;
   --chart-group-fill-opacity: 0.08;
   --chart-stroke-thin: 0.75;
@@ -17,4 +21,118 @@ svg text,
   --chart-label-font-sm: 0.85rem;
   --chart-label-font-md: 14px;
   --chart-label-font-lg: 16px;
+
+  --theme-foreground-focus: #11320B;
+}
+
+h1, h2, h3 {
+  font-family: "Old Standard TT", serif;
+  font-style:normal!important;
+}
+
+h1 {
+  font-size: 32px;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+p {
+  font-family: Monda, sans-serif;
+  font-size: 12px;
+}
+
+/* Chart alignment: keep both visualizations on the same left edge as regular text. */
+.bubble-chart,
+.radial-presence-chart {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+/* Radial presence chart: overall size, spacing, and inherited text color. */
+.radial-presence-chart {
+  margin: 8px auto;
+  margin-left: 0;
+  margin-right: auto;
+  max-width: var(--radial-chart-max-width);
+  width: 100%;
+  position: relative;
+  color: var(--theme-foreground);
+}
+
+/* Legend controls: wrapping, horizontal distribution, row spacing, and bottom gap. */
+.radial-presence-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content:flex-start;
+  gap: 4px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+/* Legend item controls: clickable hit area, label typography, and hover transition. */
+.radial-presence-chart__legend-item {
+  display: flex;
+  align-items: center;
+  padding: 3px 5px;
+  gap: 4px;
+  font-family: Monda, sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  border: 0px solid;
+  border-radius: 1px;
+  transition: border-color 120ms ease, opacity 120ms ease;
+}
+
+/* Legend swatch controls: color marker diameter and shape. */
+.radial-presence-chart__legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+/* SVG controls: make the chart fill its responsive wrapper without extra inline spacing. */
+.radial-presence-chart__svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Center readout controls: inherit the chart foreground color for hover text. */
+.radial-presence-chart__center text {
+  fill: var(--theme-foreground);
+}
+
+/* Tooltip controls: position, contrast, spacing, and fade for radial hover details. */
+.radial-presence-chart__tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-9999px, -9999px);
+  pointer-events: none;
+  background: var(--theme-background);
+  color: var(--theme-foreground);
+  border: 1px solid #000;
+  border-radius: 0;
+  padding: 0.35rem 0.7rem;
+  font-size: 12px;
+  line-height: 1.3;
+  white-space: nowrap;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.radial-presence-chart__tooltip strong {
+  font-weight: 700;
+}
+
+/* Axis label controls: muted color and shared chart label size. */
+.radial-presence-chart__x-label,
+.radial-presence-chart__y-label {
+  fill: var(--theme-foreground-muted, #666);
+  font-size: 12px;
 }
