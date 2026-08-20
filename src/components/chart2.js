@@ -6,24 +6,14 @@ import {
   SONYC_COARSE_LABELS
 } from "../utils/sonycData.js";
 
-const transitionMs = 200;
-const defaultOpacity = 0.75;
+const transitionMs = 150;
+const defaultOpacity = 0.85;
 const areaStrokeWidth = 0.75;
-const areaStrokeWidthHover = 1.5;
+const areaStrokeWidthHover = 1;
 const lightFillLuminanceThreshold = 0.6;
 const radialChartMaxWidth = 700;
 
-const myColors = [
-  "#450840",
-  "#403539",
-  "#4b4d47",
-  "#5a645a",
-  "#6c7b72",
-  "#80928b",
-  "#97a9a7",
-  "#afc1c5",
-  "#c8d9e4"
-];
+const myColors = ['#450840', '#541535', '#5b2531', '#603431', '#634231', '#645033', '#645f35', '#626d39', '#5e7b3d'];
 
 // MD USAGE:
 // ```js
@@ -44,6 +34,7 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
   }
 
   const {processedData, maxVal, sortedCategories, labelsByCategory = SONYC_COARSE_LABELS} = radialData;
+  const displayCategoryName = (name) => String(name ?? "").toLowerCase();
 
   const chartWidth = Math.min(radialChartMaxWidth, Math.max(360, width));
   const chartHeight = chartWidth;
@@ -56,54 +47,6 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
   const container = d3.create("figure")
     .attr("class", "radial-presence-chart")
     .style("--radial-chart-max-width", `${chartWidth}px`);
-  container.append("style").text(`
-    .radial-presence-chart {
-      margin: 8px auto;
-      max-width: var(--radial-chart-max-width);
-      width: 100%;
-      color: var(--theme-foreground);
-    }
-    .radial-presence-chart__legend {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
-      margin-bottom: 10px;
-      width: 100%;
-      gap: 2px 7px;
-    }
-    .radial-presence-chart__legend-item {
-      display: flex;
-      align-items: center;
-      padding: 3px 5px;
-      gap: 4px;
-      font-family: Monda, sans-serif;
-      font-size: calc(var(--chart-label-font-md, 14px) - 1px);
-      cursor: pointer;
-      border: 1px solid transparent;
-      border-radius: 5px;
-      transition: background 120ms ease, border-color 120ms ease, opacity 120ms ease;
-    }
-    .radial-presence-chart__legend-swatch {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      flex: 0 0 auto;
-    }
-    .radial-presence-chart__svg {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-    .radial-presence-chart__center text {
-      fill: var(--theme-foreground);
-    }
-    .radial-presence-chart__x-label,
-    .radial-presence-chart__y-label {
-      fill: var(--theme-foreground-muted, #666);
-      font-size: var(--chart-label-font-md, 14px);
-    }
-  `);
 
   const legend = container.append("div").attr("class", "radial-presence-chart__legend");
 
@@ -113,6 +56,7 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
     .scaleLinear()
     .domain([0, Math.max(1, sortedCategories.length - 1)])
     .range([0.4, defaultOpacity]);
+  let selectedCategory = null;
 
   const luminanceOf = (color) => (0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b) / 255;
 
@@ -136,6 +80,8 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
     .attr("role", "img")
     .attr("aria-label", "Radial chart of sound category presence by hour");
 
+  const tooltip = container.append("div").attr("class", "radial-presence-chart__tooltip");
+
   const areaGroup = svg.append("g");
   const gridGroup = svg.append("g");
 
@@ -146,6 +92,37 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
     .attr("opacity", 0);
 
   const formatCount = d3.format(",d");
+
+  const hourFromPointer = (event) => {
+    const [pointerX, pointerY] = d3.pointer(event, svg.node());
+    const angle = (Math.atan2(pointerY, pointerX) + Math.PI / 2 + 2 * Math.PI) % (2 * Math.PI);
+    return Math.round(x.invert(angle)) % 24;
+  };
+
+  function showTooltip(event, categoryKey) {
+    const hour = hourFromPointer(event);
+    const row = processedData[hour];
+    const count = row?.[categoryKey] ?? 0;
+    const categoryName = displayCategoryName(labelsByCategory[categoryKey] ?? categoryKey);
+    const [pointerX, pointerY] = d3.pointer(event, container.node());
+
+    tooltip
+      .style("transform", `translate(${pointerX + 14}px, ${pointerY + 14}px)`)
+      .style("opacity", 1)
+      .html(`Hour ${hour}<br>${formatCount(count)} instances`);
+  }
+
+  function hideTooltip() {
+    tooltip.style("opacity", 0);
+  }
+
+  svg
+    .on("mousemove", (event) => {
+      if (selectedCategory) showTooltip(event, selectedCategory);
+    })
+    .on("mouseleave", () => {
+      hideTooltip();
+    });
 
   function wrapCenterText(textString, totalCount, categoryKey) {
     centerTextGroup.selectAll("*").remove();
@@ -189,7 +166,7 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
       .attr("fill", valueColor)
       .style("font-size", "var(--chart-label-font-md, 14px)")
       .style("font-weight", "400")
-      .text(`${formatCount(totalCount)} instances`);
+      .text(`${formatCount(totalCount)} total instances`);
   }
 
   function handleHover(hoveredIndex, labelText, valueText, categoryKey) {
@@ -215,7 +192,7 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
       .style("opacity", (_d, i) => (i === hoveredIndex ? 1 : 0.5));
   }
 
-  function handleMouseLeave() {
+  function clearHover() {
     centerTextGroup.interrupt().transition().duration(transitionMs).attr("opacity", 0);
 
     areaGroup
@@ -236,18 +213,62 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
       .style("opacity", 1);
   }
 
+  function handleMouseLeave() {
+    if (selectedCategory) return;
+
+    centerTextGroup.interrupt().transition().duration(transitionMs).attr("opacity", 0);
+
+    areaGroup
+      .selectAll(".area-path")
+      .interrupt()
+      .transition()
+      .duration(transitionMs)
+      .attr("opacity", (_d, i) => opacityScale(i))
+      .attr("stroke-width", areaStrokeWidth);
+
+    legend
+      .selectAll(".radial-presence-chart__legend-item")
+      .interrupt()
+      .transition()
+      .duration(transitionMs)
+      .style("background", "transparent")
+      .style("border-color", "transparent")
+      .style("opacity", 1);
+  }
+
+  function toggleCategory(categoryKey) {
+    selectedCategory = selectedCategory === categoryKey ? null : categoryKey;
+
+    if (!selectedCategory) {
+      clearHover();
+      hideTooltip();
+      return;
+    }
+
+    const selectedIndex = sortedCategories.indexOf(selectedCategory);
+    const selectedName = displayCategoryName(labelsByCategory[selectedCategory] ?? selectedCategory);
+    const selectedTotal = d3.sum(processedData, (row) => row[selectedCategory]);
+    handleHover(selectedIndex, selectedName, selectedTotal, selectedCategory);
+  }
+
   sortedCategories.forEach((cat) => {
-    const cleanName = labelsByCategory[cat] ?? cat;
+    const cleanName = displayCategoryName(labelsByCategory[cat] ?? cat);
 
     const item = legend
       .append("div")
       .attr("class", "radial-presence-chart__legend-item")
+      .on("click", (event) => {
+        event.stopPropagation();
+        toggleCategory(cat);
+      })
       .on("mouseenter", () => {
+        if (selectedCategory) return;
         const hoveredIndex = sortedCategories.indexOf(cat);
         const totalSum = d3.sum(processedData, (row) => row[cat]);
         handleHover(hoveredIndex, cleanName, totalSum, cat);
       })
       .on("mouseleave", () => {
+        if (selectedCategory) return;
         handleMouseLeave();
       });
 
@@ -281,14 +302,26 @@ export const renderRadialPresenceChart = ({data, width = 928} = {}) => {
       const customArea = area.outerRadius((d) => y(d[cat]));
       return customArea(processedData);
     })
+    .on("click", (event, cat) => {
+      event.stopPropagation();
+      toggleCategory(cat);
+    })
     .on("mouseenter", (_event, cat) => {
-      const hoveredIndex = sortedCategories.indexOf(cat);
-      const cleanName = labelsByCategory[cat] ?? cat;
-      const totalSum = d3.sum(processedData, (row) => row[cat]);
-      handleHover(hoveredIndex, cleanName, totalSum, cat);
+      const activeCategory = selectedCategory ?? cat;
+      const activeIndex = sortedCategories.indexOf(activeCategory);
+      const cleanName = displayCategoryName(labelsByCategory[activeCategory] ?? activeCategory);
+      const totalSum = d3.sum(processedData, (row) => row[activeCategory]);
+      handleHover(activeIndex, cleanName, totalSum, activeCategory);
+      showTooltip(_event, activeCategory);
+    })
+    .on("mousemove", (event, cat) => {
+      showTooltip(event, selectedCategory ?? cat);
     })
     .on("mouseleave", () => {
-      handleMouseLeave();
+      if (!selectedCategory) {
+        handleMouseLeave();
+        hideTooltip();
+      }
     });
 
   const hourTicks = d3.range(0, 24);

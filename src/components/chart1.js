@@ -4,8 +4,8 @@ import {SONYC_COARSE_CATEGORIES, SONYC_COARSE_KEY_BY_NAME} from "../utils/sonycD
 const transitionMs = 220;
 const defaultOpacity = 0.75;
 const groupFillOpacity = 0.08; // soft category wash behind each coarse group, for Gestalt grouping
-const leafStrokeWidth = 0.75;
-const groupStrokeWidth = 1;
+const leafStrokeWidth = 0;
+const groupStrokeWidth = 0;
 const leafStrokeDarken = 0.5;
 const groupStrokeDarken = 0.5;
 const lightFillLuminanceThreshold = 0.6; // above this, switch label text to dark for contrast
@@ -27,17 +27,7 @@ export const renderBubbleChart = ({data, width = 928} = {}) => {
     throw new Error("This chart requires a hierarchical data object.");
   }
 
-  const myColors = [
-    '#450840', 
-    '#403539', 
-    '#4b4d47', 
-    '#5a645a', 
-    '#6c7b72', 
-    '#80928b', 
-    '#97a9a7', 
-    '#afc1c5', 
-    '#c8d9e4'
-  ];
+  const myColors = ['#450840', '#541535', '#5b2531', '#603431', '#634231', '#645033', '#645f35', '#626d39', '#5e7b3d'];
 
   const chartWidth = Math.max(320, width);
   const chartHeight = Math.max(420, Math.round(chartWidth * 0.78));
@@ -54,7 +44,7 @@ export const renderBubbleChart = ({data, width = 928} = {}) => {
 
   const container = d3.create("figure").attr("class", "bubble-chart");
   container.append("style").text(`
-    .bubble-chart { margin: 0; max-width: none; width: 100%; position: relative; color: var(--theme-foreground); }
+    .bubble-chart { margin: 0; margin-left: 0; margin-right: auto; max-width: 700px; width: 100%; position: relative; color: var(--theme-foreground); }
     .bubble-chart__svg { width: 100%; height: auto; display: block; }
     .bubble-chart .hierarchy-circle { cursor: pointer; }
     .bubble-chart .bubble-label { pointer-events: none; text-anchor: middle; dominant-baseline: middle; stroke-width: 0; font-weight: 400; }
@@ -68,24 +58,23 @@ export const renderBubbleChart = ({data, width = 928} = {}) => {
       background: var(--theme-background);
       color: var(--theme-foreground);
       border: 1px solid #000;
-      border-radius: 1px;
-      padding: 0.35rem 0.7rem 0.35rem 0.7rem;
-      font-size: 0.85rem;
-      line-height: 1.5;
-      white-space: nowrap;
+      border-radius: 0px;
+      padding: 0.35rem 0.7rem;
+      font-size: 12px;
+      line-height: 1.3;
+      white-space: wrap;
       z-index: 10;
       opacity: 0;
-      transition: opacity 120ms ease;
+      transition: opacity 150ms ease;
     }
     .bubble-chart__tooltip strong { font-weight: 700; }
-    .bubble-chart__tooltip-swatch { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
   `);
 
   const svg = container.append("svg")
     .attr("class", "bubble-chart__svg")
     .attr("viewBox", [0, 0, chartWidth, chartHeight])
     .attr("role", "img")
-    .attr("aria-label", data.name ?? "Bubble chart");
+    .attr("aria-label", cleanName(data.name ?? "bubble chart"));
 
   const tooltip = container.append("div").attr("class", "bubble-chart__tooltip");
 
@@ -220,7 +209,7 @@ export const renderBubbleChart = ({data, width = 928} = {}) => {
     .style("display", (d) => shouldLabel(d) ? null : "none")
     .style("font-size", (d) => `${labelFontSize(d)}px`)
     .attr("fill", (d) => labelFillFor(d))
-    .text((d) => d.data?.name ?? "");
+    .text((d) => cleanName(d.data?.name ?? ""));
 
   svg.append("g")
     .selectAll("text")
@@ -254,7 +243,7 @@ export const renderBubbleChart = ({data, width = 928} = {}) => {
 //     .text("Sales data for the first and second quarters");
 
   function cleanName(name) {
-    return String(name ?? "").replace(/-/g, " ");
+    return String(name ?? "").replace(/-/g, " ").toLowerCase();
   }
 
   function showTooltip(event, node) {
@@ -264,7 +253,7 @@ export const renderBubbleChart = ({data, width = 928} = {}) => {
     tooltip
       .style("transform", `translate(${x + 14}px, ${y + 14}px)`)
       .style("opacity", 1)
-      .html(`<strong>${cleanName(node.data?.name)}</strong><br>${formatCount(count)} instances`);
+      .html(`<strong>${cleanName(node.data?.name)}</strong><br>${formatCount(count)}`);
   }
 
   function hideTooltip() {
