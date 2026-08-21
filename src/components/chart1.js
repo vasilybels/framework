@@ -1,5 +1,5 @@
 import * as d3 from "npm:d3";
-import {SONYC_COARSE_CATEGORIES, SONYC_COARSE_KEY_BY_NAME} from "../utils/sonycData.js";
+import {SONYC_COARSE_CATEGORIES, SONYC_COARSE_KEY_BY_NAME} from "../sonycData.js";
 
 const transitionMs = 100;
 const defaultOpacity = 0.75;
@@ -16,7 +16,7 @@ const minGroupLabelInsetPx = 6;
 
 // MD USAGE:
 // ```js
-// import {buildBubbleHierarchy, filterUniversalTruthRows} from "../utils/sonycData.js";
+// import {buildBubbleHierarchy, filterUniversalTruthRows} from "../sonycData.js";
 // import {renderBubbleChart} from "./components/chart1.js";
 // const rows = await FileAttachment("data/data.csv").csv();
 // const hierarchy = buildBubbleHierarchy(filterUniversalTruthRows(rows));

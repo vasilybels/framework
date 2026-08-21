@@ -14,6 +14,14 @@ body {
   font-family: "Monda", var(--sans-serif);
 }
 
+.footer {
+  font-size: 12px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: "Monda", var(--sans-serif);
+}
+
 :root {
   --chart-opacity-default: 0.75;
   --chart-group-fill-opacity: 0.08;
@@ -22,14 +30,22 @@ body {
   --chart-label-font-sm: 0.85rem;
   --chart-label-font-md: 14px;
   --chart-label-font-lg: 16px;
-
-  --theme-foreground-focus: #000000;
   --theme-foreground-muted: #666666;
 }
 
 h1, h2, h3 {
   font-family: "Old Standard TT", serif;
-  font-style:normal!important;
+  font-weight:normal!important;
+  margin-top: 30px;
+}
+
+.homepage-intro h2 {
+  margin-top: 5px;
+  font-size: 20px;
+}
+
+.homepage-intro {
+  margin-bottom: 40px;
 }
 
 h1 {
@@ -43,6 +59,11 @@ h2 {
 p {
   font-family: Monda, sans-serif;
   font-size: 12px;
+}
+
+a {
+  font-weight: normal;
+  text-underline-offset: 3px;
 }
 
 /* Chart alignment: keep both visualizations on the same left edge as regular text. */
@@ -90,7 +111,7 @@ p {
 
 /* Bubble chart: wrapper, responsive SVG, pointer behavior, and label geometry. */
 .bubble-chart {
-  margin: 40px 0;
+  margin: 30px 0;
   max-width: 750px;
   width: 100%;
   position: relative;
@@ -167,7 +188,7 @@ p {
 
 /* Radial presence chart: overall size, spacing, and inherited text color. */
 .radial-presence-chart {
-  margin: 40px 0px 40px 0px;
+  margin: 30px 0px 30px 0px;
   max-width: var(--radial-chart-max-width);
   width: 100%;
   position: relative;

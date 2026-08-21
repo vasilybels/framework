@@ -30,33 +30,27 @@ export default {
   root: "src",
   theme: ["parchment", "ink"], // try "light", "dark", "slate", etc.
   // header: "", // what to show in the header (HTML)
-  // footer: "Built with Observable.", // what to show in the footer (HTML)
   sidebar: true, // whether to show the sidebar
-  toc: true, // whether to show the table of contents
-  pager: true, // whether to show previous & next links in the footer
+  // toc: true, // whether to show the table of contents
+  pager: false, // whether to show previous & next links in the footer
   // output: "dist", // path to the output root for build
   search: false, // activate search
   linkify: true, // convert URLs in Markdown to links
   typographer: false, // smart quotes and other typographic improvements
   // preserveExtension: false, // drop .html from URLs
   // preserveIndex: false, // drop /index from URLs
-  footer: () => `<p>(c) Vasily Belousov</p>`,
-
+  footer: () => {
+    return `
+      <div class="footer">
+        <span>Vasily Belousov</span>
+        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://are.na" target="_blank" rel="noopener noreferrer">Are.na</a>
+      </div>
+    `;
+  }
+,
   pages: [
-    {
-      name: "Data Visualization",
-      path: "/dataviz",
-      pages: [
-        {name: "Visualizing temporal data from SONYC sensors", path: "/dataviz/sonyc"},
-        {name: "Contextualizing U.S. refugee policy in data", path: "/dataviz/refugee-policy"}
-      ]
-    },
-    {
-      name: "Journalism and Creative Writing",
-      path: "/writing",
-      pages: [
-        {name: "Advanced Creative Nonfiction Workshop, Spring 2026", path: "/writing/acnf2026"}
-      ]
-    }
+    {name: "Visualizing temporal data from SONYC sensors", path: "/sonyc"}, 
   ]
 };

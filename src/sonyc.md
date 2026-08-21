@@ -4,9 +4,9 @@ title: "Visualizing temporal data from SONYC sensors"
 ---
 
 ```js
-import { buildSonicChartData } from "../utils/sonycData.js";
-import { renderBubbleChart } from "../components/chart1.js";
-const rows = await FileAttachment("../data/data.csv").csv();
+import { buildSonicChartData } from "./sonycData.js";
+import { renderBubbleChart } from "./components/chart1.js";
+const rows = await FileAttachment("./data/data.csv").csv();
 ```
 
 
@@ -60,6 +60,6 @@ display({
  
 
 ```js
-import { renderRadialPresenceChart } from "../components/chart2.js";
+import { renderRadialPresenceChart } from "./components/chart2.js";
 display(renderRadialPresenceChart({data: sonycCharts.radialPresence, width}));
 ```

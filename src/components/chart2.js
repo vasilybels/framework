@@ -4,7 +4,7 @@ import {
   filterUniversalTruthRows,
   SONYC_COARSE_CATEGORIES,
   SONYC_COARSE_LABELS
-} from "../utils/sonycData.js";
+} from "../sonycData.js";
 
 const transitionMs = 100;
 const defaultOpacity = 0.5;
@@ -20,7 +20,7 @@ const myColors = ['#450840', '#541535', '#5b2531', '#603431', '#634231', '#64503
 // MD USAGE:
 // ```js
 // import {renderRadialPresenceChart} from "./components/chart2.js";
-// import {buildRadialPresenceData, filterUniversalTruthRows} from "../utils/sonycData.js";
+// import {buildRadialPresenceData, filterUniversalTruthRows} from "../sonycData.js";
 // const rows = await FileAttachment("data/data.csv").csv();
 // const radial = buildRadialPresenceData(filterUniversalTruthRows(rows));
 // display(renderRadialPresenceChart({data: radial, width}));
