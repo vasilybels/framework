@@ -7,11 +7,13 @@ import {
 } from "../utils/sonycData.js";
 
 const transitionMs = 100;
-const defaultOpacity = 0.85;
-const areaStrokeWidth = 0.75;
-const areaStrokeWidthHover = 1;
+const defaultOpacity = 0.5;
+const areaStrokeWidth = 0.5;
+const areaStrokeWidthHover = 0;
 const lightFillLuminanceThreshold = 0.6;
 const radialChartMaxWidth = 700;
+
+let selectedCategory = null;
 
 const myColors = ['#450840', '#541535', '#5b2531', '#603431', '#634231', '#645033', '#645f35', '#626d39', '#5e7b3d'];
 
@@ -40,7 +42,7 @@ export const renderRadialPresenceChart = ({
   }
 
   const {processedData, maxVal, sortedCategories, labelsByCategory = SONYC_COARSE_LABELS} = radialData;
-  const displayCategoryName = (name) => String(name ?? "").toLowerCase();
+  const displayCategoryName = (name) => String(name ?? "");
 
   const chartWidth = Math.min(radialChartMaxWidth, Math.max(360, width));
   const chartHeight = chartWidth;
@@ -61,12 +63,6 @@ export const renderRadialPresenceChart = ({
   const legend = container.append("div").attr("class", "radial-presence-chart__legend");
 
   const x = d3.scaleLinear().domain([0, 24]).range([0, 2 * Math.PI]);
-
-  const opacityScale = d3
-    .scaleLinear()
-    .domain([0, Math.max(1, sortedCategories.length - 1)])
-    .range([0.4, defaultOpacity]);
-  let selectedCategory = null;
 
   const luminanceOf = (color) => (0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b) / 255;
 
@@ -138,10 +134,9 @@ export const renderRadialPresenceChart = ({
       hideTooltip();
     });
 
-  function wrapCenterText(textString, totalCount, categoryKey) {
+  const wrapCenterText = (textString, totalCount, categoryKey) => {
     centerTextGroup.selectAll("*").remove();
-    const accent = categoryKey ? strokeForCategory(categoryKey) : "var(--theme-foreground)";
-    const valueColor = categoryKey ? textColorForCategory(categoryKey) : "var(--theme-foreground)";
+    const accentColor = categoryKey ? colorScheme(categoryKey) : "var(--theme-foreground)";
 
     const words = String(textString ?? "").split(/\s+/).filter(Boolean);
     const lines = [];
@@ -158,30 +153,34 @@ export const renderRadialPresenceChart = ({
 
     if (currentLine.length > 0) lines.push(currentLine.join(" "));
 
-    const lineHeight = 14;
+    const lineHeight = 18;
     const totalLinesCount = lines.length + 1;
-    const startY = -((totalLinesCount - 1) * lineHeight) / 2;
+    // Offsets the starting Y baseline so the multi-line block remains perfectly centered
+    const startY = -((totalLinesCount - 1) * lineHeight) / 2 + 4;
 
     lines.forEach((lineText, index) => {
       centerTextGroup
         .append("text")
         .attr("text-anchor", "middle")
         .attr("y", startY + index * lineHeight)
-        .attr("fill", accent)
-        .style("font-size", "var(--chart-label-font-lg, 16px)")
+        .attr("fill", "var(--theme-foreground, #111)")
+        .style("font-size", "14px")
         .style("font-weight", "700")
+        .style("text-transform", "capitalize")
         .text(lineText);
     });
 
     centerTextGroup
       .append("text")
       .attr("text-anchor", "middle")
-      .attr("y", startY + lines.length * lineHeight + 4)
-      .attr("fill", valueColor)
-      .style("font-size", "var(--chart-label-font-md, 14px)")
-      .style("font-weight", "400")
-      .text(`${formatCount(totalCount)} total occurrences`);
+      .attr("y", startY + lines.length * lineHeight + 6)
+      .attr("fill", accentColor)
+      .style("font-size", "12px")
+      .style("font-weight", "normal")
+      .text(`${formatCount(totalCount)}`);
   }
+
+
 
   function handleHover(hoveredIndex, labelText, valueText, categoryKey) {
     wrapCenterText(labelText, valueText, categoryKey);
@@ -193,8 +192,8 @@ export const renderRadialPresenceChart = ({
       .interrupt()
       .transition()
       .duration(transitionMs)
-      .attr("opacity", (_d, i) => (i === hoveredIndex ? defaultOpacity : opacityScale(i) * 0.25))
-      .attr("stroke-width", (_d, i) => (i === hoveredIndex ? areaStrokeWidthHover : areaStrokeWidth));
+      .attr("opacity", (_d, i) => (i === hoveredIndex ? defaultOpacity * 2 : defaultOpacity * 0.5))
+      .attr("stroke-width", (_d, i) => (i === hoveredIndex ? areaStrokeWidthHover : 0));
 
     legend
       .selectAll(".radial-presence-chart__legend-item")
@@ -214,8 +213,8 @@ export const renderRadialPresenceChart = ({
       .interrupt()
       .transition()
       .duration(transitionMs)
-      .attr("opacity", (_d, i) => opacityScale(i))
-      .attr("stroke-width", areaStrokeWidth);
+      .attr("opacity", defaultOpacity)
+      .attr("stroke-width", 0);
 
     legend
       .selectAll(".radial-presence-chart__legend-item")
@@ -237,8 +236,8 @@ export const renderRadialPresenceChart = ({
       .interrupt()
       .transition()
       .duration(transitionMs)
-      .attr("opacity", (_d, i) => opacityScale(i))
-      .attr("stroke-width", areaStrokeWidth);
+      .attr("opacity", defaultOpacity)
+      .attr("stroke-width", 0);
 
     legend
       .selectAll(".radial-presence-chart__legend-item")
@@ -290,7 +289,7 @@ export const renderRadialPresenceChart = ({
       .append("span")
       .attr("class", "radial-presence-chart__legend-swatch")
       .style("background-color", colorScheme(cat))
-      .style("border", `1px solid ${strokeForCategory(cat)}`);
+      .style("border", `0px solid ${strokeForCategory(cat)}`);
 
     item.append("span").text(cleanName);
   });
@@ -310,8 +309,8 @@ export const renderRadialPresenceChart = ({
     .attr("class", "area-path")
     .attr("fill", colorScheme)
     .attr("stroke", (cat) => strokeForCategory(cat))
-    .attr("stroke-width", areaStrokeWidth)
-    .attr("opacity", (_d, i) => opacityScale(i))
+    .attr("stroke-width", 0)
+    .attr("opacity", defaultOpacity)
     .attr("d", (cat) => {
       const customArea = area.outerRadius((d) => y(d[cat]));
       return customArea(processedData);
@@ -345,7 +344,7 @@ export const renderRadialPresenceChart = ({
     .append("path")
     .attr("stroke", "currentColor")
     .attr("stroke-width", areaStrokeWidth)
-    .attr("stroke-opacity", 0.12)
+    .attr("stroke-opacity", 0.1)
     .attr(
       "d",
       (d) => `M ${d3.pointRadial(x(d), fixedInnerRadius)} L ${d3.pointRadial(x(d), fixedOuterRadius)}`
@@ -356,7 +355,7 @@ export const renderRadialPresenceChart = ({
     .attr("class", "radial-presence-chart__x-label")
     .attr("transform", (d) => {
       const angle = x(d) - Math.PI / 2;
-      const radius = fixedInnerRadius - 15;
+      const radius = fixedInnerRadius - 16;
       return `translate(${Math.cos(angle) * radius}, ${Math.sin(angle) * radius})`;
     })
     .attr("text-anchor", (d) => {
@@ -365,9 +364,23 @@ export const renderRadialPresenceChart = ({
       return angle < Math.PI ? "end" : "start";
     })
     .attr("dy", "0.35em")
-    .text((d) => `${d}`);
+    .style("font-size", "11px")
+    .style("font-weight", "400")
+    .style("fill", (d) => d % 6 === 0 ? "var(--theme-foreground)" : "var(--theme-foreground-muted, #666)")
+    .text((d) => {
+      if (d === 0) return "12 AM";
+      if (d === 12) return "12 PM";
+      if (d === 6) return "6 AM";
+      if (d === 18) return "6 PM";
+      return d % 3 === 0 ? `${d}` : ""; // Shows intermediate numbers every 3 hours, hides the rest
+    });
 
-  const rings = gridGroup.append("g").attr("text-anchor", "middle").selectAll("g").data(y.ticks(4)).join("g");
+
+  const rings = gridGroup.append("g")
+    .attr("text-anchor", "middle")
+    .selectAll("g")
+    .data(y.ticks(4))
+    .join("g");
 
   rings
     .append("circle")

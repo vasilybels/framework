@@ -72,9 +72,9 @@ const SONYC_CATEGORY_CONFIG = [
   },
   {
     key: "8_dog_presence",
-    name: "Dog barking/whining",
+    name: "Dog",
     children: [
-      {key: "8-1_dog-barking-whining_presence", name: "Dog barking/whining"}
+      {key: "8-1_dog-barking-whining_presence", name: "Dog"}
     ],
     collapseSingleChild: true
   }
