@@ -286,11 +286,11 @@ export const renderRadialPresenceChart = ({
         handleMouseLeave();
       });
 
-    item
-      .append("span")
-      .attr("class", "radial-presence-chart__legend-swatch")
-      .style("background-color", colorScheme(cat))
-      .style("border", `0px solid ${strokeForCategory(cat)}`);
+    // item
+    //   .append("span")
+    //   .attr("class", "radial-presence-chart__legend-swatch")
+    //   .style("background-color", colorScheme(cat))
+    //   .style("border", `0px solid ${strokeForCategory(cat)}`);
 
     item.append("span").text(cleanName);
   });
