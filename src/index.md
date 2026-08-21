@@ -13,4 +13,6 @@ toc: false
     <a href="https://www.cfr.org/articles/trumps-h-1b-visa-change-what-know">Trump’s H-1B Visa Change: What to Know</a> for the Council on Foreign Relations (contributed charts)</p>
     <h2>Works that live on this site</h2>
     <p>Explore the latest project <a href="/dataviz/sonyc">here</a>.</p>
+    <h2>Contact</h2>
+    <p>Please <a href="mailto:vasily.b@nyu.edu">email me</a> or reach out on <a href="https://www.linkedin.com/in/vasilybelousov" target="_blank" rel="noopener noreferrer">LinkedIn</a> anytime.<p>
 </div>
