@@ -43,9 +43,9 @@ export default {
     return `
       <div class="footer">
         <span>Vasily Belousov</span>
-        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://are.na" target="_blank" rel="noopener noreferrer">Are.na</a>
+        <a href="https://www.linkedin.com/in/vasilybelousov" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="https://github.com/vasilybels" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.are.na/vasily-belousov/channels" target="_blank" rel="noopener noreferrer">Are.na</a>
       </div>
     `;
   }

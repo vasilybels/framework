@@ -36,11 +36,9 @@ body {
 h1, h2, h3 {
   font-family: "Old Standard TT", serif;
   font-weight:normal!important;
-  margin-top: 30px;
 }
 
 .homepage-intro h2 {
-  margin-top: 5px;
   font-size: 20px;
 }
 
